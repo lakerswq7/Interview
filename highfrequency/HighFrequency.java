@@ -27,6 +27,12 @@ public class HighFrequency {
  * 先从数里面枚举出k/2个数存在hashmap里，存与target的差，这样复杂度是n的k / 2次方。 再从数组里枚举k / 2个数看看在不在hashmap里，
  * 所以总复杂度就是O(pow(n, k / 2));
  * 
+ * 	Two sum 的follow up: 
+ *  A. 找两数和大于target的，还是先排序，然后two pointer找，注意找到一个符合答案以后，
+ *  他后面的都要加到结果里，复杂度还是O(nlogn) 
+ * 	B. triangle count找三个能组成三角形三边的数，三层循环 i, j, k 由于 j + k 和 i + k 一定大，
+ *  所以只考虑 i + j 就转化成了A问题，由于已经排好序 复杂度为 O(n^2)
+ * 
  * 7. Quick Questions
  * 	A. Power(x, n)
  * 		先算 x 的 n / 2 次方，然后递归算下去，这样复杂度O(logn)
