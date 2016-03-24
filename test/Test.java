@@ -265,7 +265,53 @@ public class Test {
         }
         return true;
     }
+    public int calculate(String s) {
+        int result = 0, temp = 0, num = 0;
+        char sign = '+';
+        Stack<Integer> stack = new Stack<Integer>();
+        Stack<Character> operator = new Stack<Character>();
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if (Character.isDigit(c) || c == ')') {
+                if (c == ')') {
+                    num = result + temp;
+                    temp = stack.pop();
+                    result = stack.pop();
+                    sign = operator.pop();
+                } else {
+                    num = num * 10 + c - '0';
+                }
+                
+                if (i == s.length() - 1 || !Character.isDigit(s.charAt(i + 1)) || c == ')') {
+                    switch (sign) {
+                        case '+': result += temp; temp = num; break;
+                        case '-': result += temp; temp = -num; break;
+                        case '*': temp *= num; break;
+                        case '/': temp /= num; break;
+                    }
+                    num = 0;
+                }
+            } else if (c == ' ') {
+                continue;
+            } else if (c == '(') {
+                stack.push(result);
+                stack.push(temp);
+                operator.push(sign);
+                result = 0;
+                temp = 0;
+                sign = '+';
+            } else {
+                sign = c;
+            }
+        }
+        result += temp;
+        return result;
+    }
     public static void main(String[] args) {
+    	Test sol = new Test();
+    	String s = "3 * (2 * 4) - (3 / 2) * (3 * 6 / (5 - 2))";
+    	System.out.println(sol.calculate(s));
+//    	System.out.println(1 << -30);
 //    	String a = "2,2.3";
 //    	for (String c : a.split(",")) {
 //    		System.out.println(c);
@@ -275,8 +321,8 @@ public class Test {
 //    	String s = "AW,E";
 //    	s = s.toLowerCase();
 //    	System.out.println(s);
-    	Test sol = new Test();
-    	System.out.println(sol.shortestPalindrome("aaaadaaaaaaaa"));
+//    	Test sol = new Test();
+//    	System.out.println(sol.shortestPalindrome("aaaadaaaaaaaa"));
 //    	TreeNode root = new TreeNode(2);
 //    	root.left = new TreeNode(1);
 //    	root.right = new TreeNode(3);
