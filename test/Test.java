@@ -307,10 +307,223 @@ public class Test {
         result += temp;
         return result;
     }
+    public List<String> addOperators(String num, int target) {
+        List<String> rst = new ArrayList<String>();
+        if (num == null || num.length() == 0) {
+            return rst;
+        }
+        dfs(rst, "", num, 0, 0, 0, target);
+        return rst;
+    }
+    private void dfs(List<String> rst, String path, String num, int pos, long result, long temp, int target) {
+        if (outOfRange(temp) || outOfRange(result)) {
+            return;
+        }
+        if (pos == num.length()) {
+            result += temp;
+            if (result == target) {
+                rst.add(path);
+            }
+            return;
+        }
+        for (int i = pos; i < num.length(); i++) {
+            long cur = Long.parseLong(num.substring(pos, i + 1));
+            if (outOfRange(cur)) {
+                return;
+            }
+            if (pos == 0) {
+                dfs(rst, path + cur, num, i + 1, 0, cur, target);
+            } else {
+                dfs(rst, path + "+" + cur, num, i + 1, result + temp, cur, target);
+                dfs(rst, path + "-" + cur, num, i + 1, result + temp, -cur, target);
+                dfs(rst, path + "*" + cur, num, i + 1, result, temp * cur, target);
+            }
+            if (num.charAt(pos) == '0') {
+                break;
+            }
+        }
+    }
+    private boolean outOfRange(long num) {
+        return num > Integer.MAX_VALUE || num < Integer.MIN_VALUE;
+    }
+    public boolean isAdditiveNumber(String num) {
+        return isAdditive(new ArrayList<Long>(), num, 0);
+    }
+    private boolean isAdditive(ArrayList<Long> list, String num, int pos) {
+        if (pos == num.length()) {
+            return true;
+        }
+        for (int i = pos; i < num.length(); i++) {
+            if (i != pos && num.charAt(pos) == '0') {
+                return false;
+            }
+            long cur = Long.parseLong(num.substring(pos, i + 1));
+            if (outOfRange(cur)) {
+                return false;
+            }
+            if (list.size() >= 2) {
+                if (list.get(list.size() - 1) + list.get(list.size() - 2) == cur) {
+                    list.add(cur);
+                    if (isAdditive(list, num, i + 1)) {
+                        return true;
+                    }
+                    list.remove(list.size() - 1);
+                }
+            } else {
+                list.add(cur);
+                if (isAdditive(list, num, i + 1)) {
+                    return true;
+                }
+                list.remove(list.size() - 1);
+            }
+        }
+        return false;
+    }
+    public int[] maxNumber(int[] nums1, int[] nums2, int k) {
+        int m = nums1.length;
+        int n = nums2.length;
+        int[] rst = new int[k];
+        for (int i = 0; i <= k; i++) {
+            if (i > m || k - i > n) {
+                continue;
+            }
+            int[] array1 = getK(nums1, i);
+            int[] array2 = getK(nums2, k - i);
+            int[] candidate = merge(array1, array2);
+            if (isGreater(candidate, 0, rst, 0)) {
+                rst = candidate;
+            }
+        }
+        return rst;
+    }
+    private int[] merge(int[] nums1, int[] nums2) {
+        int[] ans = new int[nums1.length + nums2.length];
+        int i1 = 0, i2 = 0, i = 0;
+        while (i1 < nums1.length || i2 < nums2.length) {
+            if (isGreater(nums1, i1, nums2, i2)) {
+                ans[i++] = nums1[i1++];
+            } else {
+                ans[i++] = nums2[i2++];
+            }
+        }
+        return ans;
+    }
+    private boolean isGreater(int[] nums1, int start1, int[] nums2, int start2) {
+        while(start1 < nums1.length && start2 < nums2.length) {
+            if (nums1[start1] > nums2[start2]) {
+                return true;
+            } else if (nums1[start1] < nums2[start2]) {
+                return false;
+            }
+            start1++;
+            start2++;
+        }
+        return start1 != nums1.length;
+    }
+    private int[] getK(int[] nums, int k) {
+        int[] ans = new int[k];
+        int pos = 0;
+        for (int i = 0; i < nums.length; i++) {
+            while (pos != 0 && pos - 1 + nums.length - i >= k && ans[pos - 1] < nums[i]) {
+                pos--;
+            }
+            if (pos < k) {
+                ans[pos++] = nums[i];
+            }
+        }
+        return ans;
+    }
+    public boolean isPowerOfThree(int n) {
+        if (n <= 0) {
+            return false;
+        }
+        if ((Math.log10(n) % Math.log10(3)) == 0) {
+            return true;
+        }
+        System.out.println(Math.log10(n) / Math.log10(3));
+        return false;
+    }
+    public int minArea(char[][] image, int x, int y) {
+        int minRow = bs(image, 0, x, true, true);
+        int maxRow = bs(image, x, image.length - 1, true, false);
+        int minCol = bs(image, 0, y, false, true);
+        int maxCol = bs(image, y, image[0].length - 1, false, false);
+//        System.out.println(minRow);
+//        System.out.println(maxRow);
+//        System.out.println(minCol);
+//        System.out.println(maxCol);
+        return (maxRow - minRow) * (maxCol - minCol);
+    }
+    private boolean hasOne(char[][] image, int line, boolean searchRow) {
+        for (int i = 0; i < (searchRow ? image[0].length : image.length); i++) {
+            if ((searchRow ? image[line][i] : image[i][line]) == '1') {
+                return true;
+            }
+        }
+        return false;
+    }
+    private int bs(char[][] image, int low, int high, boolean searchRow, boolean searchMin) {
+        int mid;
+        while (low < high) {
+            mid = low + (high - low) / 2;
+            if (hasOne(image, mid, searchRow)) {
+                if (searchMin) {
+                    high = mid;
+                } else {
+                    low = mid + 1;
+                }
+            } else {
+                if (searchMin) {
+                    low = mid + 1;
+                } else {
+                    high = mid;
+                }
+            }
+        }
+        return low;
+    }
+    public List<String> generateAbbreviations(String word) {
+        List<String> rst = new ArrayList<String>();
+        getAbbr(rst, "", word, 0, false);
+        return rst;
+    }
+    private void getAbbr(List<String> rst, String cur, String word, int pos, boolean preNum) {
+        if (pos == word.length()) {
+            rst.add(cur);
+            return;
+        }
+        for (int i = pos; i < word.length(); i++) {
+            getAbbr(rst, cur + word.substring(pos, i + 1), word, i + 1, false);
+            if (!preNum) {
+                getAbbr(rst, cur + (i - pos + 1), word, i + 1, true);
+            }
+        }
+    }
+    public String reverseVowels(String s) {
+        String vowels = "aeiou";
+        char[] array = s.toCharArray();
+        int start = 0, end = array.length - 1;
+        while (start < end) {
+            while (!vowels.contains(String.valueOf(array[start])) && start < end) {
+                start++;
+            }
+            while (!vowels.contains(String.valueOf(array[end])) && start < end) {
+                end--;
+            }
+            swap(array, start, end);
+            start++;
+            end--;
+        }
+        return String.valueOf(array);
+    }
+    private void swap(char[] array, int a, int b) {
+        char temp = array[a];
+        array[a] = array[b];
+        array[b] = temp;
+    }
     public static void main(String[] args) {
     	Test sol = new Test();
-    	String s = "3 * (2 * 4) - (3 / 2) * (3 * 6 / (5 - 2))";
-    	System.out.println(sol.calculate(s));
+    	System.out.println(sol.reverseVowels("hello"));
 //    	System.out.println(1 << -30);
 //    	String a = "2,2.3";
 //    	for (String c : a.split(",")) {
