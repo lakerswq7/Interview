@@ -521,9 +521,132 @@ public class Test {
         array[a] = array[b];
         array[b] = temp;
     }
+    boolean mustBeFalse = false;
+    public boolean isMatch(String s, String p) {
+        if (s == null || p == null) {
+            return false;
+        }
+        if (p.length() == 0) {
+            return s.length() == 0;
+        }
+        if (p.charAt(0) == '*') {
+            for (int i = 0; i <= s.length(); i++) {
+                if (mustBeFalse) {
+                    return false;
+                }
+                if (isMatch(s.substring(i), p.substring(1))) {
+                    return true;
+                }
+            }
+            mustBeFalse = true;
+            return false;
+        }
+        if (s.length() == 0) {
+            return false;
+        }
+        if (s.charAt(0) == p.charAt(0) || p.charAt(0) == '?') {
+            return isMatch(s.substring(1), p.substring(1));
+        }
+        return false;
+    }
+    public class ValidWordAbbr {
+        HashMap<String, String> map;
+        public ValidWordAbbr(String[] dictionary) {
+            map = new HashMap<String, String>();
+            for (String s : dictionary) {
+                String abbr = transfer(s);
+                if (map.containsKey(abbr)) {
+                    if (!map.get(abbr).equals(s)) {
+                        map.put(abbr, null);
+                    }
+                } else {
+                    map.put(abbr, s);
+                }
+            } 
+        }
+
+        public boolean isUnique(String word) {
+            String abbr = transfer(word);
+            if (map.containsKey(abbr) && !map.get(abbr).equals(word)) {
+                return false;
+            }
+            return true;
+        }
+        private String transfer(String word) {
+            if (word.length() <= 2) {
+                return word;
+            }
+            StringBuilder sb = new StringBuilder();
+            sb.append(word.charAt(0));
+            sb.append(word.length() - 2);
+            sb.append(word.charAt(word.length() - 1));
+            return sb.toString();
+        } 
+    }
+    public boolean isStrobogrammatic(String num) {
+        if (num == null || num.length() == 0) {
+            return false;
+        }
+        int start = 0, end = num.length() - 1;
+        while (start <= end) {
+            if (!isValid(num, start, end)) {
+                return false;
+            }
+            start++;
+            end--;
+        }
+        return true;
+    }
+    
+    private boolean isValid(String num, int start, int end) {
+        HashMap<Character, Character> map = new HashMap<Character, Character>();
+        map.put('0', '0');
+        map.put('1', '1');
+        map.put('8', '8');
+        map.put('6', '9');
+        map.put('9', '6');
+        int s = num.charAt(start);
+        int e = num.charAt(end);
+        System.out.println(s);
+        System.out.println(e);
+        
+        if (!map.containsKey(s) || map.get(s) != e) {
+        	System.out.println(map.containsKey(s));
+            return false;
+        }
+        return true;
+    }
+    public List<String> findMissingRanges(int[] nums, int lower, int upper) {
+        List<String> rst = new ArrayList<String>();
+        for (int i = 0; i < nums.length; i++) {
+            if (lower < upper) {
+                break;
+            }
+            if (nums[i] < lower) {
+                continue;
+            } else if (nums[i] > upper) {
+                rst.add(getRange(lower, upper));
+                break;
+            } else {
+                if (nums[i] > lower) {
+                    rst.add(getRange(lower, nums[i] - 1));
+                }
+                lower = nums[i] + 1;
+            }
+        }
+        return rst;
+    }
+    private String getRange(int start, int end) {
+        if (start == end) {
+            return String.valueOf(start);
+        }
+        StringBuilder sb = new StringBuilder();
+        sb.append(start);
+        sb.append("->");
+        sb.append(end);
+        return sb.toString();
+    }
     public static void main(String[] args) {
-    	Test sol = new Test();
-    	System.out.println(sol.reverseVowels("hello"));
 //    	System.out.println(1 << -30);
 //    	String a = "2,2.3";
 //    	for (String c : a.split(",")) {
