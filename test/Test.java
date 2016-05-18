@@ -646,6 +646,42 @@ public class Test {
         sb.append(end);
         return sb.toString();
     }
+    public int atoi(String str) {
+        // write your code here
+        if (str == null || str.length() == 0) {
+            return 0;
+        }
+        str = str.trim();
+        int index = 0;
+        int sign = 1;
+        if (str.charAt(index) == '+' || str.charAt(index) == '-') {
+            if (str.charAt(index) == '-') {
+                sign = -1;
+            }
+            index++;
+        }
+        long num = 0;
+        while (index < str.length()) {
+            char c = str.charAt(index);
+            if (Character.isDigit(c)) {
+                num = num * 10 + c - '0';
+                if (num > Integer.MAX_VALUE) {
+                    break;
+                }
+            } else {
+                break;
+            }
+            index++;
+        }
+        num = sign * num;
+        if (num >= Integer.MAX_VALUE) {
+            return Integer.MAX_VALUE;
+        } else if (num <= Integer.MIN_VALUE) {
+            return Integer.MIN_VALUE;
+        }
+        return (int)num;
+    }
+
     public static void main(String[] args) {
 //    	System.out.println(1 << -30);
 //    	String a = "2,2.3";
